@@ -27,11 +27,23 @@ function App() {
     );
   }
 
+  function handlerToggleItem(id) {
+    setItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, packed: !item.packed } : item
+      )
+    );
+  }
+
   return (
     <div className="app">
       <Logo />
       <Form onAddItems={handlerAddItems} />
-      <PackingList items={items} onDeleteItem={handlerDeleteItem} />
+      <PackingList
+        items={items}
+        onDeleteItem={handlerDeleteItem}
+        onToggleItem={handlerToggleItem}
+      />
       <Stats items={items} />
     </div>
   );
@@ -94,12 +106,17 @@ function Form({ onAddItems }) {
 }
 
 // 3. PackingList 输入物品的列表
-function PackingList({ items, onDeleteItem }) {
+function PackingList({ items, onDeleteItem, onToggleItem }) {
   return (
     <div className="list">
       <ul>
         {items.map((item) => (
-          <Item key={item.id} onDeleteItem={onDeleteItem} item={item} />
+          <Item
+            key={item.id}
+            onDeleteItem={onDeleteItem} // 传递给Item组件的onDeleteItem函数
+            onToggleItem={onToggleItem} // 传递给Item组件的onToggleItem函数
+            item={item}
+          />
         ))}
       </ul>
     </div>
@@ -107,9 +124,14 @@ function PackingList({ items, onDeleteItem }) {
 }
 
 // PackingList 组件中的Item组件
-function Item({ item, onDeleteItem }) {
+function Item({ item, onDeleteItem, onToggleItem }) {
   return (
     <li>
+      <input // 复选框
+        type="checkbox"
+        value={item.packed}
+        onChange={() => onToggleItem(item.id)} // 通过onChange事件监听器来监听复选框的变化
+      />
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
         {item.quantity} - {item.description}
       </span>
